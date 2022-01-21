@@ -5,21 +5,56 @@ log_user 0
 set FNC /dev/shm/HY-comm
 set FNS /dev/shm/HY-stat
 
+spawn gpiomon gpiochip0 [read [open /dev/gpio/TRG/d0_offset r]]
+set gpioid $spawn_id
 
 spawn inotifywait -m -e close_write -q $FNC
+set cmdid $spawn_id
+
+set gate_disabled 1
+
+proc disable_gate {} {
+	global gate_disabled
+	exec set.site 0 SIG:EVENT_SRC:3 TRG
+	set gate_disabled 0
+}
+
+proc enable_gate {} {
+	global gate_disabled
+	if { $gate_disabled } {
+		exec set.site 0 SIG:EVENT_SRC:3 MOD
+		set gate_disabled 0
+	}
+}
+
+proc trg_stat {} {
+	if { $gate_disabled } {
+		return "WAIT TRG"
+	} else {
+		return "RUN"
+	}
+}
 
 
 
 while { 1 } {
 	expect {
-		"$FNC*\n" {
+		-i $gpioid -re "event: (FALLING).*$" {
+			puts "got falling $expect_out(1,string)"
+		}
+		-i $gpioid -re "event:  (RISING).*$" {
+			enable_gate
+			puts "event rising $expect_out(1,string)"
+		}		
+		-i $cmdid "$FNC*\n" {
+			disable_gate
 			set fp [open $FNS w]
 			puts $fp [read [open $FNC r]]
 			close $fp
 			send_user "[read [open $FNC r]]\rHY-ctrl>"
 		}
                 -i $user_spawn_id -re "\n" {
-			send_user "[read [open $FNC r]]\rHY-ctrl>"
+			send_user "[read [open $FNC r]] [trg_stat]\rHY-ctrl>"
 		}
 	}
 }
