@@ -25,7 +25,7 @@ NEW filename =>
 
 5.2 HYCON responds to NEW:
 - disables FACET gate source
-- enabled TRG signal
+- enable TRG signal
 - posts NEW filename message to HY-status
 - responds to TRG with low latency, enabling FACET
 - data flows immediately on the next FACET
