@@ -1,0 +1,25 @@
+#!/bin/sh
+# custom_hyl_early .. do this before IOC
+
+# configure soft trigger on site 1 - typical default
+set.site 1 trg=1,1,1
+
+# Configure active channels on QEN Biscuit
+rm /etc/acq400/2/active_chan
+rm /etc/acq400/2/data32
+echo 0 > /etc/acq400/2/data32 
+echo 4 > /etc/acq400/2/active_chan
+echo 4 > /etc/acq400/2/NCHAN
+
+# Enable SPAD to include uSecond counter in the data
+set.site 0 spad 1,2,0 
+set.site 0 spad1_us 1,2,1
+
+
+# set sites in aggregator set
+run0 1,2
+
+# configure transient channel data server at ports 53000+CH
+make-ch-server
+
+

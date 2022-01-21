@@ -11,10 +11,10 @@ spawn inotifywait -m -e close_write -q $FNS
 while { 1 } {
 	expect {
 		"$FNS*\n" {
-			send_user "[read [open $FNS r]]\rHY-stat>\r"
+			send_user "[read [open $FNS r]]\rHY-stat>"
 		}
                 -i $user_spawn_id -re "\n" {
-			send_user "[read [open $FNS r]]\rHY-stat>\r"
+			send_user "[read [open $FNS r]]\rHY-stat>"
 		}
 	}
 }

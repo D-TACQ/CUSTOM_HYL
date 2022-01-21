@@ -12,6 +12,17 @@ inetd /etc/inetd.hyl.conf
 PIDF=/var/run/hyl.pid
 LOG=/var/log/hyl.log
 
+echo "OLD $(hostname)_def.dat" >/dev/shm/HY-comm
+echo "OLD $(hostname)_def.dat" >/dev/shm/HY-stat
+
+EARLY=/usr/local/init/init/custom_hyl_early
+if [ -e /mnt/local/custom_hyl_early ]; then
+	EARLY=/mnt/local/custom_hyl_early
+fi
+echo +++ $EARLY start
+$EARLY
+echo +++ $EARLY complete
+
 /usr/local/bin/procServ -c / -p $PIDF -L $LOG 61003 HY-ctrl
 
 (
