@@ -1,0 +1,21 @@
+
+echo -e "You must have the GPG package instantiated for this script to be effective!\n"
+
+# Disable GPG
+set.site 0 gpg_enable 0
+
+# Enable GPG Monitor
+/usr/local/epics/scripts/gpg_monitor 1
+
+# Set Event Bus source to GPG
+for i in 0 1 2 3; do set.site 0 evt_src_d${i} 1;done
+
+# Echo STL to GPG
+#nc localhost 4541 < hylog_gpg
+nc localhost 4541 < hylog_gpg4
+
+# Set GPG to LOOP and Enable GPG
+set.site 0 gpg_mode 2 # LOOP
+#set.site 0 gpg_mode 0 # ONCE
+set.site 0 gpg_enable 1
+
