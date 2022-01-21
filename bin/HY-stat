@@ -13,10 +13,10 @@ proc get_ctrl_stat {} {
 while { 1 } {
 	expect {
 		"$FNS*\n" {
-			send_user "[read [open $FNS r]]\rHY-stat>"
+			send_user "HY-stat> [read [open $FNS r]]"
 			}
 		-i $user_spawn_id -re "\n" {
-			send_user "[get_ctrl_stat] [read [open $FNS r]]\rHY-stat>"
+			send_user "HY-stat> [get_ctrl_stat] [read [open $FNS r]]"
 		}
 	}
 }

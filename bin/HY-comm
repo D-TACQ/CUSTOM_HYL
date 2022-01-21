@@ -2,6 +2,11 @@
 # HY-comm: responds to command NEW
 
 set FNC /dev/shm/HY-comm
+set FNS /dev/shm/HY-stat
+
+proc get_ctrl_stat {} {
+	return [lindex [exec get.site 0 SIG:EVENT_SRC:3] 1]
+}
 
 
 catch {
@@ -11,14 +16,10 @@ catch {
 				set fp [open $FNC w]
 				puts $fp "NEW $expect_out(1,string)"
 				close $fp
-				if { [catch {send_user "HY-comm> OK $expect_out(1,string)\n\r"} ] } {
-					exit
-				}
+				send_user "HY-comm> OK $expect_out(1,string)\n\r"
 			}
 			-re "\n" {
-				if { [ catch {send_user "HY-comm>"} ] } {
-					exit
-				}	
+				send_user "HY-comm> [get_ctrl_stat] [read [open $FNS r]]"
 			}
 		}		
 	}
