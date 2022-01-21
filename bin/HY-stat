@@ -1,0 +1,21 @@
+#!/usr/bin/env expect
+# HY-stat reports current status file
+
+log_user 0
+set FNS /dev/shm/HY-stat
+
+spawn inotifywait -m -e close_write -q $FNS
+
+
+
+while { 1 } {
+	expect {
+		"$FNS*\n" {
+			send_user "[read [open $FNS r]]\rHY-stat>\r"
+		}
+                -i $user_spawn_id -re "\n" {
+			send_user "[read [open $FNS r]]\rHY-stat>\r"
+		}
+	}
+}
+

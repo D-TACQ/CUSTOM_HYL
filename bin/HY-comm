@@ -1,0 +1,18 @@
+#!/usr/bin/env expect
+# HY-comm: responds to command NEW
+
+set FNC /dev/shm/HY-comm
+
+
+while { 1 } {
+	expect_user {
+		-re "NEW (\[A-Za-z0-9\._]+).*$" {
+			puts [open $FNC w] "NEW $expect_out(1,string)"
+			send_user "HY-comm> OK $expect_out(1,string)\r"
+		}
+                -re "\n" {
+			send_user "HY-comm>\r"
+		}
+	}
+}
+

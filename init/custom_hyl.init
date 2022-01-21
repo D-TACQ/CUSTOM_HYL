@@ -1,0 +1,17 @@
+#!/bin/sh
+
+
+cat - >/etc/inetd.hyl.conf <<EOF
+61001 stream tcp nowait root HY-comm HY-comm dummy
+61002 stream tcp nowait root HY-stat HY-stat dummy
+EOF
+sed -i "s/SITE/$SITE/g" /etc/inetd.hyl.conf
+
+inetd /etc/inetd.hyl.conf
+
+PIDF=/var/run/hyl.pid
+LOG=/var/log/hyl.log
+
+/usr/local/bin/procServ -c / -p $PIDF -L $LOG 61003 HY-ctrl
+
+
