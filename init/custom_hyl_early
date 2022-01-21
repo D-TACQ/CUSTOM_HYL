@@ -23,3 +23,20 @@ run0 1,2
 make-ch-server
 
 
+
+# nobble TRG.d0
+cd /dev/gpio/TRG
+mv d0 _d0
+echo 0 > d0
+
+# awk this .. it's not going to move, so we hard-code for now:
+# /dev/gpio/TRG/d0 -> /sys/class/gpio/gpio448/value
+# acq1001_507> ls -l /sys/class/gpio/ | grep 448
+# gpio448 -> ../../devices/soc0/amba/e000a000.gpio/gpiochip0/gpio/gpio448
+# acq1001_507> ls -l /sys/class/gpio/gpiochip* | grep e000a000.gpio
+# /sys/class/gpio/gpiochip394 -> ../../devices/soc0/amba/e000a000.gpio/gpio/gpiochip394
+
+echo 448 > /sys/class/gpio/unexport
+echo $((448-394)) >/dev/gpio/TRG/d0_offset
+
+
