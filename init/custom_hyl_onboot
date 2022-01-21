@@ -1,0 +1,25 @@
+# HYL final setup, runs AFTER rc.user
+
+# Configure Digital Encoder
+set.site 2 phaseA_en 1
+set.site 2 zsel 3
+set.site 2 Zcount_en 1
+set.site 2 es_enable 1
+set.site 2 msb_direct 1
+# Push FACET (A) onto Module Event
+set.site 0 SIG:EVENT_SRC:3 MOD
+
+# Configure RTM to trigger on FACET Rising Edge
+set.site 1 rgm=3,3,1
+
+TL=8192
+
+# ES is 4 samples long..
+set.site 1 rtm_translen $(($TL-4))
+SSB=$(get.site 0 ssb)
+
+# one buffer per FACET for snappy waveform update
+set.site 0 bufferlen $(($TL*$SSB))
+
+set.sys /sys/module/acq420fmc/parameters/DMA_TIMEOUT 100000
+

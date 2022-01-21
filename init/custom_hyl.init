@@ -14,4 +14,16 @@ LOG=/var/log/hyl.log
 
 /usr/local/bin/procServ -c / -p $PIDF -L $LOG 61003 HY-ctrl
 
+(
+	while [ ! -e /var/www/d-tacq/rc-local-complete ]; do
+		sleep 1
+	done
+	ONBOOT=/usr/local/init/custom_hyl_onboot
+	if [ -e /mnt/local/custom_hyl_onboot ]; then
+		ONBOOT=/mnt/local/custom_hyl_onboot
+	fi
+	echo +++ $ONBOOT start
+	$ONBOOT
+	echo +++ $ONBOOT complete
+) &
 
