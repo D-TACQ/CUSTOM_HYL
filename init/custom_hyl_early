@@ -5,8 +5,8 @@
 set.site 1 trg=1,1,1
 
 # Configure active channels on QEN Biscuit
-rm /etc/acq400/2/active_chan
-rm /etc/acq400/2/data32
+rm -f /etc/acq400/2/active_chan
+rm -f /etc/acq400/2/data32
 echo 0 > /etc/acq400/2/data32 
 echo 4 > /etc/acq400/2/active_chan
 echo 4 > /etc/acq400/2/NCHAN

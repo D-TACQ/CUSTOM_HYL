@@ -13,11 +13,13 @@ spawn inotifywait -m -e close_write -q $FNC
 while { 1 } {
 	expect {
 		"$FNC*\n" {
-			puts [open $FNS w] [read [open $FNC r]]			
-			send_user "[read [open $FNC r]]\rHY-stat>\r"
+			set fp [open $FNS w]
+			puts $fp [read [open $FNC r]]
+			close $fp
+			send_user "[read [open $FNC r]]\rHY-ctrl>"
 		}
                 -i $user_spawn_id -re "\n" {
-			send_user "[read [open $FNC r]]\rHY-stat>\r"
+			send_user "[read [open $FNC r]]\rHY-ctrl>"
 		}
 	}
 }

@@ -23,7 +23,7 @@ echo +++ $EARLY start
 $EARLY
 echo +++ $EARLY complete
 
-/usr/local/bin/procServ -c / -p $PIDF -L $LOG 61003 HY-ctrl
+/usr/local/bin/procServ -c / -p $PIDF -L $LOG 61003 /usr/local/bin/HY-ctrl
 
 (
 	while [ ! -e /var/www/d-tacq/rc-local-complete ]; do
