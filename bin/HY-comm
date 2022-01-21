@@ -4,17 +4,22 @@
 set FNC /dev/shm/HY-comm
 
 
-while { 1 } {
-	expect_user {
-		-re "NEW (\[A-Za-z0-9\._]+).*$" {
-			set fp [open $FNC w]
-			puts $fp "NEW $expect_out(1,string)"
-			close $fp
-			send_user "HY-comm> OK $expect_out(1,string)\n\r"
-		}
-                -re "\n" {
-			send_user "HY-comm>"
-		}
+catch {
+	while { 1 } {
+		expect_user {
+			-re "NEW (\[A-Za-z0-9\._]+).*$" {
+				set fp [open $FNC w]
+				puts $fp "NEW $expect_out(1,string)"
+				close $fp
+				if { [catch {send_user "HY-comm> OK $expect_out(1,string)\n\r"} ] } {
+					exit
+				}
+			}
+			-re "\n" {
+				if { [ catch {send_user "HY-comm>"} ] } {
+					exit
+				}	
+			}
+		}		
 	}
 }
-
