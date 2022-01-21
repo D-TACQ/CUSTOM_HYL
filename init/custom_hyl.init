@@ -15,7 +15,7 @@ LOG=/var/log/hyl.log
 echo "OLD $(hostname)_def.dat" >/dev/shm/HY-comm
 echo "OLD $(hostname)_def.dat" >/dev/shm/HY-stat
 
-EARLY=/usr/local/init/init/custom_hyl_early
+EARLY=/usr/local/init/custom_hyl_early
 if [ -e /mnt/local/custom_hyl_early ]; then
 	EARLY=/mnt/local/custom_hyl_early
 fi

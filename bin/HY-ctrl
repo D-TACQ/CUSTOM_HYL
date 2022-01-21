@@ -12,7 +12,7 @@ spawn inotifywait -m -e close_write -q $FNC
 
 while { 1 } {
 	expect {
-		"$FN1*\n" {
+		"$FNC*\n" {
 			puts [open $FNS w] [read [open $FNC r]]			
 			send_user "[read [open $FNC r]]\rHY-stat>\r"
 		}
