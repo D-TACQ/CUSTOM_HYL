@@ -16,10 +16,10 @@ catch {
 				set fp [open $FNC w]
 				puts $fp "NEW $expect_out(1,string)"
 				close $fp
-				send_user "HY-comm> OK $expect_out(1,string)\n\r"
+				send_user "OK $expect_out(1,string)\n\rHY-comm>"
 			}
 			-re "\n" {
-				send_user "HY-comm> [get_ctrl_stat] [read [open $FNS r]]"
+				send_user " [get_ctrl_stat] [read [open $FNS r]]HY-comm>"
 			}
 		}		
 	}

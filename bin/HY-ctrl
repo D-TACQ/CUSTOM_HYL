@@ -5,34 +5,32 @@ log_user 0
 set FNC /dev/shm/HY-comm
 set FNS /dev/shm/HY-stat
 
+set EVT_KNOB	/dev/acq400.0.knobs/evt_src_d3
+set EVT_DISABLE 0
+set EVT_ENABLE  3   
+
 spawn gpiomon gpiochip0 [string trim [read [open /dev/gpio/TRG/d0_offset r]]]
 set gpioid $spawn_id
 
 spawn inotifywait -m -e close_write -q $FNC
 set cmdid $spawn_id
 
-set gate_disabled 1
+set gate_enabled 1
 
-proc disable_gate {} {
-	global gate_disabled
-	exec set.site 0 SIG:EVENT_SRC:3 TRG
-	set gate_disabled 1
-}
-
-proc enable_gate {} {
-	global gate_disabled
-	if { $gate_disabled } {
-		exec set.site 0 SIG:EVENT_SRC:3 MOD
-		set gate_disabled 0
-	}
+proc enable_gate {en} {
+	global gate_enabled
+	set fp [open $EVT_KNOB w]
+	puts $fp $en
+	close $fp
+	set gate_enabled $fp
 }
 
 proc trg_stat {} {
-	global gate_disabled
-	if { $gate_disabled } {
-		return "WAIT TRG"
-	} else {
+	global gate_enabled
+	if { $gate_enabled } {
 		return "RUN"
+	} else {		
+		return "WAIT TRG"
 	}
 }
 
@@ -44,18 +42,18 @@ while { 1 } {
 			puts "got falling $expect_out(1,string)"
 		}
 		-i $gpioid -re "event:  (RISING).*$" {
-			enable_gate
+			enable_gate $EVT_ENABLE
 			puts "event rising $expect_out(1,string)"
 		}		
 		-i $cmdid "$FNC*\n" {
-			disable_gate
+			enable_gate $EVT_DISABLE
 			set fp [open $FNS w]
 			puts $fp [read [open $FNC r]]
 			close $fp
-			send_user "[read [open $FNC r]]\rHY-ctrl>"
+			send_user "HY-ctrl>[read [open $FNC r]]"
 		}
                 -i $user_spawn_id -re "\n" {
-			send_user "[trg_stat] [read [open $FNC r]]\rHY-ctrl>"
+			send_user "HY-ctrl>[trg_stat] [read [open $FNC r]]"
 		}
 	}
 }
