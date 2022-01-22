@@ -18,7 +18,7 @@ set cmdid $spawn_id
 set gate_enabled 1
 
 proc enable_gate {en} {
-	global gate_enabled
+	global EVT_KNOB gate_enabled
 	set fp [open $EVT_KNOB w]
 	puts $fp $en
 	close $fp
