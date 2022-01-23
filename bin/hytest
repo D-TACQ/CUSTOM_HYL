@@ -1,4 +1,24 @@
 #!/usr/bin/env expect
+# hytest HYL test harness, sets "NEW tray", auto-triggers INDEX from FG if available
+# may run on UUT or on a remote PC. Could be the data logger PC.
+# 
+# USAGE:
+# hytest first-tray last-tray [FGSLEEP]   
+#   first-tray: first tray# in series
+#   last-tray : last tray# in series
+#   FGSLEEP   : float seconds, delay before index command
+#
+# REQUIRES: expect(9)
+# from linux:hytest 0 10 0.3
+# from windows: expect hytest 0 10 0.3
+#
+# IMPORTANT: hosts set by environment variables
+# FG : function generator IP (we use Agilent 33210, YMMV)
+# UUT: UUT ip
+# defaults: FG: manual (prompt when done),  UUT=localhost
+# to run with other settings:
+# FG=sg0149 UUT=acq1001_507 hytest 0 10 0.3
+
 puts "HY TEST"
 
 set s0 0
@@ -17,15 +37,49 @@ puts "s0 $s0 s1 $s1"
 
 
 # DNS names. Use IP if you have to
-set FG sg0149
-set UUT acq1001_507
+set FG manual
+set UUT localhost
 
-spawn nc $FG 5025
-set id_fg $spawn_id
+proc do_manual_trigger {} {
+	puts "Press CR when trigger done"
+        while {1} {
+        	expect_user {
+                        "\n" {
+			 	puts "continue.."
+                        	break
+                        }
+                }
+	}
+}
+
+proc do_agilent_trigger {} {
+	global FGSLEEP id_fg
+	sleep $FGSLEEP
+	send -i $id_fg "TRIG\n"
+}
+
+
+set trgfun do_manual_trigger
+
+
+if { [info exists ::env(FG) ] } {
+	set FG $::env(FG)
+	if { $FG != {manual} } {
+		spawn nc $FG 5025
+		set id_fg $spawn_id
+		set trgfun do_agilent_trigger
+	}
+}
+
+if { [info exists ::env(UUT) ] } {
+	set UUT $::env(UUT)
+}
+
 
 spawn nc $UUT 61001
 set id_cmd $spawn_id
 
+# test mode .. how fast can we trigger the FG. check counter TRG.d0 increments by $s1 - $s0
 if { [info exists ::env(TRGTIMER) ] } {
 	if { $::env(TRGTIMER) > 0 } {
 		for { set ii $s0 } { $ii < $s1 } { incr ii } {
@@ -38,6 +92,7 @@ if { [info exists ::env(TRGTIMER) ] } {
 	}
 }
 
+# main test loop here
 for { set ii $s0 } { $ii < $s1 } { incr ii } {
 	puts "tray $ii"
 	send -i $id_cmd "NEW tray[format {%04d} $ii]\r\n"
@@ -52,12 +107,12 @@ for { set ii $s0 } { $ii < $s1 } { incr ii } {
 			}
 		}
 	}
-	sleep $FGSLEEP
-	send -i $id_fg "TRIG\n"
+	$trgfun
 	sleep 10
 }
 
-send -i $id_cmd "NEW default\r\n"
+send -i $id_cmd "NEW QUIT\r\n"
+$trgfun
 sleep 1
 
 
