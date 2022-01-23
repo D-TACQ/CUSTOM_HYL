@@ -9,7 +9,7 @@ set EVT_KNOB	/dev/acq400.0.knobs/evt_src_d3
 set EVT_DISABLE 0
 set EVT_ENABLE  3   
 
-spawn gpiomon gpiochip0 [string trim [read [open /dev/gpio/TRG/d0_offset r]]]
+spawn gpiomon --rising-edge gpiochip0 [string trim [read [open /dev/gpio/TRG/d0_offset r]]]
 set gpioid $spawn_id
 
 spawn inotifywait -m -e close_write -q $FNC
