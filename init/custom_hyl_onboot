@@ -1,17 +1,24 @@
 # HYL final setup, runs AFTER rc.user
 
+# customer requires 1.25MSPS. Works at 2MSPS ..
+set.site 0 sync_role master 1250000
+
 # Configure Digital Encoder
 set.site 2 phaseA_en 1
 set.site 2 zsel 3
 set.site 2 Zcount_en 1
 set.site 2 es_enable 1
+
+# Enable new msb_direct, embeds d1, d2 state in d31 of FACET, INDEX counters.
 set.site 2 msb_direct 1
+
 # Push FACET (A) onto Module Event
 set.site 0 SIG:EVENT_SRC:3 MOD
 
 # Configure RTM to trigger on FACET Rising Edge
 set.site 1 rgm=3,3,1
 
+# Customer requires transient 8192, but sorry we have to steal 4 samples for ES.
 TL=8192
 
 # ES is 4 samples long..
@@ -21,5 +28,6 @@ SSB=$(get.site 0 ssb)
 # one buffer per FACET for snappy waveform update
 set.site 0 bufferlen $(($TL*$SSB))
 
+# 10000 sec timeout (3h maximum time between trays..)
 set.sys /sys/module/acq420fmc/parameters/DMA_TIMEOUT 100000
 
