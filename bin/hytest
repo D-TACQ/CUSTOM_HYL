@@ -1,0 +1,63 @@
+#!/usr/bin/env expect
+puts "HY TEST"
+
+set s0 0
+set s1 10
+set FGSLEEP 0.5
+
+if { $::argc > 1 } {
+	set s0 [lindex $::argv 0]
+	set s1 [lindex $::argv 1]
+	if { $::argc > 2 } {
+		set FGSLEEP [lindex $::argv 2]
+	}
+}
+
+puts "s0 $s0 s1 $s1"
+
+
+# DNS names. Use IP if you have to
+set FG sg0149
+set UUT acq1001_507
+
+spawn nc $FG 5025
+set id_fg $spawn_id
+
+spawn nc $UUT 61001
+set id_cmd $spawn_id
+
+if { [info exists ::env(TRGTIMER) ] } {
+	if { $::env(TRGTIMER) > 0 } {
+		for { set ii $s0 } { $ii < $s1 } { incr ii } {
+			puts "TRGTIMER"
+			send -i $id_fg "TRIG\n"
+			sleep $FGSLEEP
+		}
+		sleep 1
+		exit
+	}
+}
+
+for { set ii $s0 } { $ii < $s1 } { incr ii } {
+	puts "tray $ii"
+	send -i $id_cmd "NEW tray[format {%04d} $ii]\r\n"
+	if { $ii == 0 } {
+		puts "Press CR when stream ready"
+		while {1} {
+			expect_user {
+				"\n" {
+					puts "OK to trigger .."
+					break
+				}
+			}
+		}
+	}
+	sleep $FGSLEEP
+	send -i $id_fg "TRIG\n"
+	sleep 10
+}
+
+send -i $id_cmd "NEW default\r\n"
+sleep 1
+
+
