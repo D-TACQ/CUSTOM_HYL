@@ -10,14 +10,16 @@ proc get_ctrl_stat {} {
 	return [lindex [exec get.site 0 SIG:EVENT_SRC:3] 1]
 }
 
-while { 1 } {
-	expect {
-		"$FNS*\n" {
-			send_user "[read [open $FNS r]]HY-stat>"
+catch {
+	while { 1 } {
+		expect {
+			"$FNS*\n" {
+				send_user "[read [open $FNS r]]HY-stat>"
+			}
+			-i $user_spawn_id -re "\n" {
+				send_user "[get_ctrl_stat] [read [open $FNS r]]HY-stat>"
+			}
 		}
-		-i $user_spawn_id -re "\n" {
-			send_user "[get_ctrl_stat] [read [open $FNS r]]HY-stat>"
-		}
-	}
+	}	
 }
 
