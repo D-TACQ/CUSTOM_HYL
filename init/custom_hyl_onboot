@@ -31,3 +31,4 @@ set.site 0 bufferlen $(($TL*$SSB))
 # 10000 sec timeout (3h maximum time between trays..)
 set.sys /sys/module/acq420fmc/parameters/DMA_TIMEOUT 100000
 
+/usr/local/CARE/axi-dma-enable-live-stream
