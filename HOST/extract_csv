@@ -1,0 +1,4 @@
+#!/bin/bash
+# extract csv "spreadsheet" from run data log
+SRC=${1:-nfg}
+(grep ^FILE $SRC | head -n 1; grep HYDAT/ $SRC) > ${SRC%*.csv}_times.csv

@@ -36,4 +36,9 @@ NEW filename =>
 - responds to a NEW message on HY-status by starting a new file
 
 
+6. Host Side Scripts
+
+6.1 HOST/hytest : automates a session
+6.2 HOST/extract_csv : extracts timing data from a session log
+
 
