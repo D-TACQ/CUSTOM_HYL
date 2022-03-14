@@ -1,7 +1,7 @@
 # HYL final setup, runs AFTER rc.user
 
 # customer requires 1.25MSPS. Works at 2MSPS ..
-set.site 0 sync_role master 1250000
+set.site 0 sync_role master 1250000 TRG:DX=d0
 
 # Configure Digital Encoder
 set.site 2 phaseA_en 1
