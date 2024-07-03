@@ -39,6 +39,7 @@ echo +++ $EARLY complete
 	echo +++ $ONBOOT start
 	$ONBOOT
 	echo +++ $ONBOOT complete
+	date > /var/www/d-tacq/custom_hyl_onboot_complete
 ) &
 
 }
