@@ -25,9 +25,6 @@ make-ch-server
 
 
 # nobble TRG.d0
-cd /dev/gpio/TRG
-mv d0 _d0
-echo 0 > d0
 
 # awk this .. it's not going to move, so we hard-code for now:
 # /dev/gpio/TRG/d0 -> /sys/class/gpio/gpio448/value
@@ -35,8 +32,18 @@ echo 0 > d0
 # gpio448 -> ../../devices/soc0/amba/e000a000.gpio/gpiochip0/gpio/gpio448
 # acq1001_507> ls -l /sys/class/gpio/gpiochip* | grep e000a000.gpio
 # /sys/class/gpio/gpiochip394 -> ../../devices/soc0/amba/e000a000.gpio/gpio/gpiochip394
+#
+GPIO_TRG_d0=$(ls -l /dev/gpio/TRG/d0 | awk '{ print $11 }' | awk -F / '{ print $5 }' | sed -e 's/gpio//')
+GPIO_CHIP_ADDR=$(ls -l /sys/class/gpio/ | grep $GPIO_TRG_d0 | awk '{ print $11 }' | awk -F/ '{ print $6 }')
+GPIO_CHIP_BASE=$(ls -l /sys/class/gpio/gpiochip* | grep $GPIO_CHIP_ADDR | awk '{ print $9 }' | sed -e 's/[^0-9]*//')
+GPIO_TRG_d0_offset=$((GPIO_TRG_d0-$GPIO_CHIP_BASE))
 
-echo 448 > /sys/class/gpio/unexport
-echo $((448-394)) >/dev/gpio/TRG/d0_offset
+cd /dev/gpio/TRG
+mv d0 _d0
+echo 0 > d0
+
+echo "GPIO_TRG_d0 $GPIO_TRG_d0 GPIO_CHIP_BASE $GPIO_CHIP_BASE GPIO_TRG_d0_offset $GPIO_TRG_d0_offset"
+echo $GPIO_TRG_d0 > /sys/class/gpio/unexport
+echo $GPIO_TRG_d0_offset >/dev/gpio/TRG/d0_offset
 
 
